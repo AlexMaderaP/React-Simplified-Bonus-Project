@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.11.0",
     "@quixo3/prisma-session-store": "^3.1.13",
     "@t3-oss/env-core": "^0.6.0",
     "cors": "^2.8.5",
@@ -30,7 +30,7 @@
     "@types/express-session": "^1.17.7",
     "@types/node": "^20.4.1",
     "nodemon": "^3.0.1",
-    "prisma": "^5.0.0",
+    "prisma": "^5.11.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }
