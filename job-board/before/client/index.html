@@ -5,6 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Board</title>
+    <script>
+      let theme = JSON.parse(localStorage.getItem("theme"));
+      if (theme === "System") {
+        theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "Dark"
+          : "Light";
+      }
+
+      document.documentElement.classList.toggle("dark", theme === "Dark");
+    </script>
   </head>
   <body class="dark:bg-slate-950 bg:white text-slate-900 dark:text-slate-100">
     <div id="root"></div>
