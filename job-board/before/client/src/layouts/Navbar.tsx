@@ -30,7 +30,7 @@ export function Navbar() {
         <SmallScreenMenu />
         <NavItem label="Task board" to="/tasks" />
         <NavItem label="Job Listings" to="/" />
-        <NavItem label="Log in" to="/" />
+        <NavItem label="Login" to="/login" />
       </div>
     </nav>
   );
@@ -100,10 +100,14 @@ function SmallScreenMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center">
-        <DropdownMenuItem>Task Board</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/tasks">Task Board</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem>Job Listings</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log In</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/login">Login</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
