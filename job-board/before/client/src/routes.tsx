@@ -6,6 +6,7 @@ import { NewTaskPage } from "@/pages/tasks/NewTaskPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { LogInPage } from "./pages/auth/LogInPage";
 import { SignUpPage } from "./pages/auth/SignUpPage";
+import { signupAction } from "./features/authentication";
 
 export const routes: RouteObject[] = [
   {
@@ -33,6 +34,7 @@ export const routes: RouteObject[] = [
           {
             path: "signup",
             element: <SignUpPage />,
+            action: signupAction,
           },
           { path: "*", element: <NotFoundPage /> },
         ],

@@ -18,20 +18,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useSubmit } from "react-router-dom";
+import { signupSchema } from "@backend/constants/schemas/users";
 
 type SignupFormValues = z.infer<typeof formSchema>;
 
 type SignupFormProps = {
   initialValues?: SignupFormValues;
-  onSubmit: (SignupInfo: SignupFormValues) => void;
 };
 
-const formSchema = z
-  .object({
-    email: z.string().email().max(255).nonempty(),
-    password: z.string().min(8).nonempty(),
-    confirmPassword: z.string().nonempty(),
+const formSchema = signupSchema
+  .extend({
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords must match!",
@@ -46,16 +44,30 @@ const DEFAULT_VALUES: SignupFormValues = {
 
 export function SignupForm({
   initialValues = DEFAULT_VALUES,
-  onSubmit,
 }: SignupFormProps) {
+  const submit = useSubmit();
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialValues,
   });
 
+  async function onSubmit(e: React.FormEvent) {
+    const isValid = await form.trigger();
+    e.preventDefault();
+    if (isValid) {
+      const { email, password } = form.getValues();
+      submit(
+        { email, password },
+        {
+          method: "post",
+        }
+      );
+    }
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={(e) => onSubmit(e)}>
         <Card className="w-96 ">
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>

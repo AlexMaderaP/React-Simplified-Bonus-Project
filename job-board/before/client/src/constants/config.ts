@@ -1,5 +1,6 @@
-import { createEnv } from "@t3-oss/env-core"
-import { z } from "zod"
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+import axios from "axios";
 
 export const env = createEnv({
   clientPrefix: "VITE_",
@@ -8,4 +9,6 @@ export const env = createEnv({
   },
   isServer: false,
   runtimeEnv: import.meta.env,
-})
+});
+
+export const baseApi = axios.create({ baseURL: import.meta.env.VITE_API_URL });

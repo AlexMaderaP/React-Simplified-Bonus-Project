@@ -18,19 +18,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { loginSchema } from "@backend/constants/schemas/users";
 import { Link } from "react-router-dom";
 
-type LoginFormValues = z.infer<typeof formSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 type LoginFormProps = {
   initialValues?: LoginFormValues;
   onSubmit: (LoginInfo: LoginFormValues) => void;
 };
-
-const formSchema = z.object({
-  email: z.string().email().max(255),
-  password: z.string().min(8),
-});
 
 const DEFAULT_VALUES: LoginFormValues = {
   email: "",
@@ -42,7 +38,7 @@ export function LoginForm({
   onSubmit,
 }: LoginFormProps) {
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: initialValues,
   });
 
