@@ -11,3 +11,10 @@ export function registerUser(data: registerUserType) {
     .then((res) => res.data)
     .catch((error) => Promise.reject(error));
 }
+
+export function getSession() {
+  return baseApi
+    .get("/users/session")
+    .then((res) => res.data)
+    .catch((error) => Promise.reject(error));
+}

@@ -4,18 +4,28 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   useChangeThemeContext,
   useThemeContext,
 } from "@/hooks/useThemeContext";
-import { Menu, Moon, Sun } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ChevronDown, Menu, Moon, Sun } from "lucide-react";
+import { Link, useLoaderData } from "react-router-dom";
+
+type UserData = {
+  id: string;
+  email: string;
+} | null;
 
 export function Navbar() {
   const { isDark } = useThemeContext();
   const changeTheme = useChangeThemeContext();
+  const data = useLoaderData() as UserData;
+  const isAuth = data !== null;
 
   return (
     <nav className="flex sticky top-0 z-50 justify-between border-b items-center p-4 px-8 mb-4 bg-white dark:bg-slate-950">
@@ -27,10 +37,14 @@ export function Navbar() {
           setDark={() => changeTheme("Dark")}
           setSystem={() => changeTheme("System")}
         />
-        <SmallScreenMenu />
+        <SmallScreenMenu email={isAuth ? data.email : undefined} />
         <NavItem label="Task board" to="/tasks" />
-        <NavItem label="Job Listings" to="/" />
-        <NavItem label="Login" to="/login" />
+        <NavItem label="Job Listings" to="/login" />
+        {isAuth ? (
+          <LoggedInMenu email={data.email} />
+        ) : (
+          <NavItem label="Login" to="/login" />
+        )}
       </div>
     </nav>
   );
@@ -43,7 +57,7 @@ type NavItemProps = {
 
 function NavItem({ to, label }: NavItemProps) {
   return (
-    <Button variant="ghost" asChild className="hidden sm:inline-flex">
+    <Button variant="ghost" className="hidden sm:inline-flex">
       <Link to={to}>{label}</Link>
     </Button>
   );
@@ -87,7 +101,11 @@ function ToggleThemeItem({
   );
 }
 
-function SmallScreenMenu() {
+type SmallScreenMenuProps = {
+  email: String | undefined;
+};
+
+function SmallScreenMenu({ email }: SmallScreenMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -106,8 +124,46 @@ function SmallScreenMenu() {
         <DropdownMenuItem>Job Listings</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/login">Login</Link>
+          {email !== undefined ? (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger asChild>
+                {email} <ChevronDown className="ml-auto h-4 w-4" />
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem asChild>
+                  <Link to="/">My Listings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          ) : (
+            <NavItem label="Login" to="/login" />
+          )}
         </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function LoggedInMenu({ email }: { email: String }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800 hidden sm:inline-flex"
+        >
+          <span>{email}</span>
+          <ChevronDown />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center">
+        <DropdownMenuItem asChild>
+          <Link to="/">My Listings</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

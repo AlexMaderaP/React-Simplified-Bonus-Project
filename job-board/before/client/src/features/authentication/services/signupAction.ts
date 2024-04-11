@@ -7,6 +7,7 @@ export async function signupAction({ request }: ActionFunctionArgs) {
   const email = formData.get("email")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
 
-  await registerUser({ email, password });
+  const data = await registerUser({ email, password });
+  console.log(data);
   return redirect("/tasks");
 }

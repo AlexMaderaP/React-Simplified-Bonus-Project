@@ -6,12 +6,13 @@ import { NewTaskPage } from "@/pages/tasks/NewTaskPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { LogInPage } from "./pages/auth/LogInPage";
 import { SignUpPage } from "./pages/auth/SignUpPage";
-import { signupAction } from "./features/authentication";
+import { getSessionLoader, signupAction } from "./features/authentication";
 
 export const routes: RouteObject[] = [
   {
     path: "/",
     element: <RootLayout />,
+    loader: getSessionLoader,
     children: [
       {
         errorElement: <ErrorPage />,
