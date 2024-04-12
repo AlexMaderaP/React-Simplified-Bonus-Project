@@ -19,13 +19,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { loginSchema } from "@backend/constants/schemas/users";
-import { Link } from "react-router-dom";
+import { Link, useActionData, useSubmit } from "react-router-dom";
+import { useEffect } from "react";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 type LoginFormProps = {
   initialValues?: LoginFormValues;
-  onSubmit: (LoginInfo: LoginFormValues) => void;
 };
 
 const DEFAULT_VALUES: LoginFormValues = {
@@ -33,14 +33,39 @@ const DEFAULT_VALUES: LoginFormValues = {
   password: "",
 };
 
-export function LoginForm({
-  initialValues = DEFAULT_VALUES,
-  onSubmit,
-}: LoginFormProps) {
+type ActionData =
+  | {
+      message: string;
+    }
+  | undefined;
+
+export function LoginForm({ initialValues = DEFAULT_VALUES }: LoginFormProps) {
+  const submit = useSubmit();
+  const data = useActionData() as ActionData;
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    if (data !== undefined) {
+      form.setError(
+        "password",
+        { type: "custom", message: data.message },
+        { shouldFocus: true }
+      );
+    }
+  }, [data]);
+
+  async function onSubmit() {
+    const { email, password } = form.getValues();
+    submit(
+      { email, password },
+      {
+        method: "POST",
+      }
+    );
+  }
 
   return (
     <Form {...form}>

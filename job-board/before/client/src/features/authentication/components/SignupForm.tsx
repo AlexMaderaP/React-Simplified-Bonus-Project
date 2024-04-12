@@ -51,23 +51,19 @@ export function SignupForm({
     defaultValues: initialValues,
   });
 
-  async function onSubmit(e: React.FormEvent) {
-    const isValid = await form.trigger();
-    e.preventDefault();
-    if (isValid) {
-      const { email, password } = form.getValues();
-      submit(
-        { email, password },
-        {
-          method: "post",
-        }
-      );
-    }
+  async function onSubmit() {
+    const { email, password } = form.getValues();
+    submit(
+      { email, password },
+      {
+        method: "post",
+      }
+    );
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card className="w-96 ">
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>

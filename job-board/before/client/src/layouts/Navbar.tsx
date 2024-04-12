@@ -14,7 +14,7 @@ import {
   useThemeContext,
 } from "@/hooks/useThemeContext";
 import { ChevronDown, Menu, Moon, Sun } from "lucide-react";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useSubmit } from "react-router-dom";
 
 type UserData = {
   id: string;
@@ -22,10 +22,16 @@ type UserData = {
 } | null;
 
 export function Navbar() {
+  const submit = useSubmit();
+
   const { isDark } = useThemeContext();
   const changeTheme = useChangeThemeContext();
   const data = useLoaderData() as UserData;
   const isAuth = data !== null;
+
+  function handleLogout() {
+    submit(null, { method: "DELETE" });
+  }
 
   return (
     <nav className="flex sticky top-0 z-50 justify-between border-b items-center p-4 px-8 mb-4 bg-white dark:bg-slate-950">
@@ -37,11 +43,17 @@ export function Navbar() {
           setDark={() => changeTheme("Dark")}
           setSystem={() => changeTheme("System")}
         />
-        <SmallScreenMenu email={isAuth ? data.email : undefined} />
+        <SmallScreenMenu
+          email={data && data.email}
+          handleLogout={() => handleLogout()}
+        />
         <NavItem label="Task board" to="/tasks" />
         <NavItem label="Job Listings" to="/login" />
         {isAuth ? (
-          <LoggedInMenu email={data.email} />
+          <LoggedInMenu
+            email={data.email}
+            handleLogout={() => handleLogout()}
+          />
         ) : (
           <NavItem label="Login" to="/login" />
         )}
@@ -102,10 +114,11 @@ function ToggleThemeItem({
 }
 
 type SmallScreenMenuProps = {
-  email: String | undefined;
+  email: String | null;
+  handleLogout: () => void;
 };
 
-function SmallScreenMenu({ email }: SmallScreenMenuProps) {
+function SmallScreenMenu({ email, handleLogout }: SmallScreenMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -123,30 +136,36 @@ function SmallScreenMenu({ email }: SmallScreenMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuItem>Job Listings</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          {email !== undefined ? (
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger asChild>
-                {email} <ChevronDown className="ml-auto h-4 w-4" />
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem asChild>
-                  <Link to="/">My Listings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          ) : (
-            <NavItem label="Login" to="/login" />
-          )}
-        </DropdownMenuItem>
+        {email !== null ? (
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger asChild>
+              {email} <ChevronDown className="ml-auto h-4 w-4" />
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem asChild>
+                <Link to="/">My Listings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link to="/login">Login</Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function LoggedInMenu({ email }: { email: String }) {
+function LoggedInMenu({
+  email,
+  handleLogout,
+}: {
+  email: String;
+  handleLogout: () => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -163,7 +182,7 @@ function LoggedInMenu({ email }: { email: String }) {
           <Link to="/">My Listings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

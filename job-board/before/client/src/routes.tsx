@@ -4,15 +4,21 @@ import { ErrorPage } from "@/pages/ErrorPage";
 import { TaskListPage } from "@/pages/tasks/TaskListPage";
 import { NewTaskPage } from "@/pages/tasks/NewTaskPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
-import { LogInPage } from "./pages/auth/LogInPage";
-import { SignUpPage } from "./pages/auth/SignUpPage";
-import { getSessionLoader, signupAction } from "./features/authentication";
+import { LogInPage } from "@/pages/auth/LogInPage";
+import { SignUpPage } from "@/pages/auth/SignUpPage";
+import {
+  getSessionLoader,
+  logInAction,
+  logOutAction,
+  signupAction,
+} from "@/features/authentication";
 
 export const routes: RouteObject[] = [
   {
     path: "/",
     element: <RootLayout />,
     loader: getSessionLoader,
+    action: logOutAction,
     children: [
       {
         errorElement: <ErrorPage />,
@@ -31,6 +37,7 @@ export const routes: RouteObject[] = [
           {
             path: "login",
             element: <LogInPage />,
+            action: logInAction,
           },
           {
             path: "signup",
