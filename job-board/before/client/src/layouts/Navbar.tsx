@@ -13,8 +13,21 @@ import {
   useChangeThemeContext,
   useThemeContext,
 } from "@/hooks/useThemeContext";
+import {
+  Dialog,
+  DialogHeader,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ChevronDown, Menu, Moon, Sun } from "lucide-react";
-import { Link, useLoaderData, useSubmit } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "react-router-dom";
 
 type UserData = {
   id: string;
@@ -22,43 +35,49 @@ type UserData = {
 } | null;
 
 export function Navbar() {
-  const submit = useSubmit();
-
   const { isDark } = useThemeContext();
   const changeTheme = useChangeThemeContext();
   const data = useLoaderData() as UserData;
+  const submit = useSubmit();
+  const navigation = useNavigation();
   const isAuth = data !== null;
+  const isLoggingOut =
+    (navigation.state === "submitting" || navigation.state === "loading") &&
+    navigation.formMethod === "delete";
 
   function handleLogout() {
     submit(null, { method: "DELETE" });
   }
 
   return (
-    <nav className="flex sticky top-0 z-50 justify-between border-b items-center p-4 px-8 mb-4 bg-white dark:bg-slate-950">
-      <span className="text-lg pl-2 font-semibold">Job App</span>
-      <div className="flex items-center gap-2 pr-4">
-        <ToggleThemeItem
-          isDark={isDark}
-          setLight={() => changeTheme("Light")}
-          setDark={() => changeTheme("Dark")}
-          setSystem={() => changeTheme("System")}
-        />
-        <SmallScreenMenu
-          email={data && data.email}
-          handleLogout={() => handleLogout()}
-        />
-        <NavItem label="Task board" to="/tasks" />
-        <NavItem label="Job Listings" to="/login" />
-        {isAuth ? (
-          <LoggedInMenu
-            email={data.email}
+    <Dialog open={isLoggingOut}>
+      <nav className="flex sticky top-0 z-50 justify-between border-b items-center p-4 px-8 mb-4 bg-white dark:bg-slate-950">
+        <span className="text-lg pl-2 font-semibold">Job App</span>
+        <div className="flex items-center gap-2 pr-4">
+          <ToggleThemeItem
+            isDark={isDark}
+            setLight={() => changeTheme("Light")}
+            setDark={() => changeTheme("Dark")}
+            setSystem={() => changeTheme("System")}
+          />
+          <SmallScreenMenu
+            email={data && data.email}
             handleLogout={() => handleLogout()}
           />
-        ) : (
-          <NavItem label="Login" to="/login" />
-        )}
-      </div>
-    </nav>
+          <NavItem label="Task board" to="/tasks" />
+          <NavItem label="Job Listings" to="/login" />
+          {isAuth ? (
+            <LoggedInMenu
+              email={data.email}
+              handleLogout={() => handleLogout()}
+            />
+          ) : (
+            <NavItem label="Login" to="/login" />
+          )}
+        </div>
+      </nav>
+      <LogOutDialog />
+    </Dialog>
   );
 }
 
@@ -146,7 +165,11 @@ function SmallScreenMenu({ email, handleLogout }: SmallScreenMenuProps) {
                 <Link to="/">My Listings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              <DialogTrigger asChild>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DialogTrigger>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
         ) : (
@@ -182,8 +205,21 @@ function LoggedInMenu({
           <Link to="/">My Listings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+        <DialogTrigger asChild>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+        </DialogTrigger>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+function LogOutDialog() {
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Logging Out</DialogTitle>
+      </DialogHeader>
+      <LoadingSpinner className="w-10 h-10" />
+    </DialogContent>
   );
 }
